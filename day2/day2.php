@@ -26,7 +26,7 @@ namespace {
             }
 
             // === Part 1 ====
-            $p1 = numValidReports($reports, $debug);
+            $p1 = numValidReports($reports);
 
             echo "Part 1 answer: {$p1}";
         } else {
@@ -42,59 +42,76 @@ namespace {
 
     // ==================== functions ====================
 
-    function numValidReports(array &$reports, $debug) : int
+    /**
+     * Returns the number of valid reports according the constraints of Part 1.
+     *
+     * @param array $reports
+     * @return int
+     */
+    function numValidReports(array &$reports) : int
     {
         $validReportCount = 0;
 
         foreach($reports as $_k1 => $report) {
-
-            $last = $report[0];
-            $direction = null;
-            $isValidReport = true;
-
-            if ($debug) {
-                echo "=== report ===\n";
-            }
-
-            for($i = 1, $len = count($report); $i < $len; $i++) {
-
-                $diff = $last - $report[$i];
-
-                if ($debug) {
-                    echo "{$diff}\t";
-                }
-
-                $diffAbs = abs($diff);
-                $validDiffMagnitude = $diffAbs >= 1 && $diffAbs <= 3;
-
-                if ( ! $validDiffMagnitude ) {
-                    $isValidReport = false;
-                    break;
-                }
-
-                $localDirection = ($diff < 0) ? Enums\Direction::Increasing : Enums\Direction::Decreasing;
-                $sameDirection = $direction === null || $direction === $localDirection;
-
-                if ( ! $sameDirection) {
-                    $isValidReport = false;
-                    break;
-                }
-
-                // update for next level check
-                $last = $report[$i];
-                $direction = $localDirection;
-            }
-
-            if ($debug) {
-                printf("\nIS VALID: %u\n", $isValidReport);
-            }
-
-            if ($isValidReport) {
+            if (isValidReport($report)) {
                 $validReportCount++;
             }
         }
 
         return $validReportCount;
+    }
+
+    /**
+     * Iterates across all levels of report, returning `true` if report is valid and `false` otherwise.
+     *
+     * @param array $report array of levels representing the report
+     * @return bool `true` if report is valid
+     */
+    function isValidReport(array  &$report) : bool
+    {
+        global $debug;
+        $last = $report[0];
+        $direction = null;
+        $isValidReport = true;
+
+        if ($debug) {
+            echo "=== report ===\n";
+        }
+
+        for($i = 1, $len = count($report); $i < $len; $i++) {
+
+            $diff = $last - $report[$i];
+
+            if ($debug) {
+                echo "{$diff}\t";
+            }
+
+            $diffAbs = abs($diff);
+            $validDiffMagnitude = $diffAbs >= 1 && $diffAbs <= 3;
+
+            if ( ! $validDiffMagnitude ) {
+                $isValidReport = false;
+                break;
+            }
+
+            $localDirection = ($diff < 0) ? Enums\Direction::Increasing : Enums\Direction::Decreasing;
+            $sameDirection = $direction === null || $direction === $localDirection;
+
+            if ( ! $sameDirection) {
+                $isValidReport = false;
+                break;
+            }
+
+            // update for next level check
+            $last = $report[$i];
+            $direction = $localDirection;
+        }
+
+        if ($debug) {
+            printf("\nIS VALID: %u\n", $isValidReport);
+        }
+
+        return $isValidReport;
     }
 
     function toInt(string $num): int
